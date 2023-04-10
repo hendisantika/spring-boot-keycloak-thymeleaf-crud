@@ -1,9 +1,9 @@
 package com.hendisantika.crudthymeleaf.config;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 /**
@@ -18,19 +18,18 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
  */
 //@Configuration
 //@EnableWebSecurity
-public class WebSecurity extends WebSecurityConfigurerAdapter {
+public class WebSecurity {
     private final InMemoryClientRegistrationRepository registrationRepository;
 
     public WebSecurity(InMemoryClientRegistrationRepository registrationRepository) {
         this.registrationRepository = registrationRepository;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         String[] permitAccess = new String[]{"/", "/styles/**"};
 
         http.authorizeRequests()
-                .antMatchers(permitAccess)
+                .requestMatchers(permitAccess)
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -44,6 +43,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                             logout.clearAuthentication(true);
                             logout.deleteCookies("JSESSIONID");
                         });
+        return http.build();
     }
 
     private LogoutSuccessHandler logoutSuccessHandler() {
