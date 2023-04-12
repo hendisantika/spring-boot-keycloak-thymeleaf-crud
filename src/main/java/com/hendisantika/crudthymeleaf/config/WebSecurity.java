@@ -5,6 +5,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,7 +50,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     private LogoutSuccessHandler logoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler handler =
                 new OidcClientInitiatedLogoutSuccessHandler(registrationRepository);
-        handler.setPostLogoutRedirectUri("http://127.0.0.1:8888/");
+        handler.setPostLogoutRedirectUri("http://localhost:8080/realms/PowerRanger/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Flocalhost%3A8888");
 
         return handler;
     }
