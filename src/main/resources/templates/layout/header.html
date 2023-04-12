@@ -23,7 +23,10 @@
                                     <a th:href="@{/products/add}">Create Product</a>
                                 </li>
                                 <li>
-                                    <a href="http://localhost:8080/realms/PowerRanger/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Flocalhost%3A8888%2F2">Logout</a>
+                                    <form name="logoutForm" th:action="@{/sso/logout}" method="post" th:hidden="true">
+                                        <input hidden type="submit" value="Sign Out"/>
+                                    </form>
+                                    <a href="javascript: document.logoutForm.submit()"> Logout</a>
                                 </li>
                             </ul>
                         </div>
