@@ -63,6 +63,11 @@ public class ProductController {
         return "index";
     }
 
+    @RequestMapping(path = "/2")
+    public String index2() {
+        return "index2";
+    }
+
     @RolesAllowed("admin")
     @GetMapping("/products/add")
     public String createProduct(Model model) {
