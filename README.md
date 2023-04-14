@@ -2,9 +2,22 @@
 
 Spring MVC CRUD Application with Thymeleaf, HTML5, CSS3 and Bootstrap
 
-In this application, you can see a demonstration of using Spring Boot, Spring Data, Spring MVC, Thymeleaf, HTML5, CSS3 and Bootstrap all together to build a foundational web application.
+In this application, you can see a demonstration of using Spring Boot, Spring Data, Spring MVC, Thymeleaf, HTML5, CSS3
+and Bootstrap all together to build a foundational web application.
 
-Source Code for http://udemy.com/learn-spring-and-spring-boot-10x-productive-java-development/
+Run Keycloak using Docker Container:
+
+```shell
+docker run --name keycloak_dev \
+-p 8080:8080 \
+-e KEYCLOAK_ADMIN=admin \
+-e KEYCLOAK_ADMIN_PASSWORD=admin \
+        quay.io/keycloak/keycloak:latest \
+        start-dev
+```
+
+Run Keycloak using Docker Compose:
+`docker-compose up`
 
 Run this by copy to your terminal :
 
