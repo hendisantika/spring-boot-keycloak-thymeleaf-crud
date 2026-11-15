@@ -21,7 +21,7 @@ services:
       DB_PASSWORD: keycloak
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-    image: quay.io/keycloak/keycloak:25.0.4
+    image: quay.io/keycloak/keycloak:26.8.2-2
     command:
       - start-dev
       - --import-realm
