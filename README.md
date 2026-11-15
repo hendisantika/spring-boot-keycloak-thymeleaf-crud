@@ -18,7 +18,7 @@ secured with **Keycloak** through **Spring Security OAuth2 Client (OpenID Connec
 | Keycloak         | OIDC provider (realm `PowerRanger`, client `login-app`)                 |
 | Persistence      | Spring Data JPA + H2 in-memory database                                 |
 | View             | Thymeleaf + Bootstrap (WebJars)                                         |
-| Build            | Maven Wrapper (Maven 3.9.x)                                             |
+| Build            | Maven Wrapper (Maven 3.10.x)                                            |
 
 > The legacy Keycloak Spring adapter (`keycloak-spring-boot-starter`) is deprecated and does not work with
 > Spring Boot 3+/4. This project uses Spring Security's native OAuth2/OIDC support instead.
