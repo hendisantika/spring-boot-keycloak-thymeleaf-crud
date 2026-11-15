@@ -1,11 +1,15 @@
 package com.hendisantika.crudthymeleaf.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,41 +21,47 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * Time: 13.04
  * To change this template use File | Settings | File Templates.
  */
-//@Configuration
-//@EnableWebSecurity
-public class WebSecurity extends WebSecurityConfigurerAdapter {
-    private final InMemoryClientRegistrationRepository registrationRepository;
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(jsr250Enabled = true)
+public class WebSecurity {
 
-    public WebSecurity(InMemoryClientRegistrationRepository registrationRepository) {
+    private static final String ADMIN = "admin";
+    private static final String USER = "user";
+
+    private final ClientRegistrationRepository registrationRepository;
+    private final KeycloakOidcUserService keycloakOidcUserService;
+
+    public WebSecurity(ClientRegistrationRepository registrationRepository,
+                       KeycloakOidcUserService keycloakOidcUserService) {
         this.registrationRepository = registrationRepository;
+        this.keycloakOidcUserService = keycloakOidcUserService;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        String[] permitAccess = new String[]{"/", "/styles/**"};
-
-        http.authorizeRequests()
-                .antMatchers(permitAccess)
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .oauth2Login()
-                .and()
-                .logout(
-                        logout -> {
-                            logout.logoutSuccessHandler(logoutSuccessHandler());
-                            logout.invalidateHttpSession(true);
-                            logout.clearAuthentication(true);
-                            logout.deleteCookies("JSESSIONID");
-                        });
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(req -> req
+                        .requestMatchers("/", "/2", "/error", "/css/**", "/images/**", "/webjars/**",
+                                "/actuator/health/**").permitAll()
+                        .requestMatchers("/products/add", "/products/edit/**", "/products/delete/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/products").hasRole(ADMIN)
+                        .requestMatchers("/products").hasAnyRole(ADMIN, USER)
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.oidcUserService(keycloakOidcUserService)))
+                .logout(logout -> logout
+                        .logoutSuccessHandler(logoutSuccessHandler())
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID"));
+        return http.build();
     }
 
     private LogoutSuccessHandler logoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler handler =
                 new OidcClientInitiatedLogoutSuccessHandler(registrationRepository);
-        handler.setPostLogoutRedirectUri("http://localhost:8080/realms/PowerRanger/protocol/openid-connect/logout?redirect_uri=http%3A%2F%2Flocalhost%3A8888");
-
+        handler.setPostLogoutRedirectUri("{baseUrl}");
         return handler;
     }
 }

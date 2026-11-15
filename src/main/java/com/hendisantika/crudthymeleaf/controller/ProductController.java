@@ -2,17 +2,14 @@ package com.hendisantika.crudthymeleaf.controller;
 
 import com.hendisantika.crudthymeleaf.model.Product;
 import com.hendisantika.crudthymeleaf.repository.ProductRepository;
-import org.keycloak.admin.client.Keycloak;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.annotation.security.RolesAllowed;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,30 +23,6 @@ import javax.annotation.security.RolesAllowed;
  */
 @Controller
 public class ProductController {
-    @Value("${keycloak.resource}")
-    private String keycloakClient;
-
-    @Value("${keycloak.auth-server-url}")
-    private String keycloakUrl;
-
-    @Value("${keycloak.realm}")
-    private String keycloakRealm;
-
-    @Value("${is.keycloak.admin.user}")
-    private String keycloakAdminUser;
-
-    @Value("${is.keycloak.admin.password}")
-    private String keycloakAdminPassword;
-
-    private Keycloak getKeycloakInstance() {
-        return Keycloak.getInstance(
-                keycloakUrl,
-                "master",
-                keycloakAdminUser,
-                keycloakAdminPassword,
-                "admin-cli");
-    }
-
     private ProductRepository productRepository;
 
     @Autowired
@@ -57,7 +30,6 @@ public class ProductController {
         this.productRepository = productRepository;
     }
 
-    @RolesAllowed({"admin", "user"})
     @RequestMapping(path = "/")
     public String index() {
         return "index";
@@ -92,7 +64,7 @@ public class ProductController {
     @RolesAllowed("admin")
     @GetMapping("/products/edit/{id}")
     public String editProduct(Model model, @PathVariable(value = "id") String id) {
-        model.addAttribute("product", productRepository.findById(id));
+        model.addAttribute("product", productRepository.findById(id).orElseThrow());
         return "edit";
     }
 
@@ -102,11 +74,4 @@ public class ProductController {
         productRepository.deleteById(id);
         return "redirect:/products";
     }
-
-//    @GetMapping("logout")
-//    public String logout() {
-//        Keycloak keycloak = getKeycloakInstance();
-//
-//        Response result = keycloak.realm(keycloakRealm).deleteSession(jwt.getClaimAsString("session_state"));
-//    }
 }
